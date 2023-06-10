@@ -1,70 +1,98 @@
-import 'package:flutter/material.dart';
+import "package:flutter/material.dart";
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MaterialApp(
+      home: MyApp(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
+class MyApp extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+  _State createState() => _State();
+}
+
+class _State extends State<MyApp> {
+  String _value = "Hello World";
+  int counter = 0;
+  List<Widget> _list = [];
+
+  void _onClicked() => setState(() => _value = DateTime.now().toString());
+
+  @override
+  void initState() {
+    for (int i = 0; i < 5; i++) {
+      Widget child = _newItem(i);
+      _list.add(child);
+    }
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  void _onClicked2() {
+    Widget child = _newItem(counter);
+    setState(() => _list.add(child));
+  }
 
-  final String title;
+  // Widget _newItem(int i) => Text("Item $i");
+  Widget _newItem(int i) {
+    Key key = Key("item_$i");
+    Container child = Container(
+      key: key,
+      padding: EdgeInsets.all(10.0),
+      child: Chip(
+        label: Text("$i Name here"),
+        deleteIconColor: Colors.red,
+        deleteButtonTooltipMessage: "Delete",
+        onDeleted: () => _removeItem(key),
+        avatar: CircleAvatar(
+          backgroundColor: Colors.grey.shade800,
+          child: Text(i.toString()),
+        ),
+      ),
+    );
+    counter++;
+    return child;
+  }
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  // remove the item clicked
+  void _removeItem(Key key) {
+    for (int i = 0; i < _list.length; i++) {
+      Widget child = _list.elementAt(i);
+      if (child.key == key) {
+        setState(() => _list.removeAt(i));
+        print("Removing ${key.toString()}");
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
+        title: Text("Stateful Widget"),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+        onPressed: _onClicked2,
+        child: Icon(Icons.add),
+      ),
+      body: Container(
+        padding: EdgeInsets.all(32.0),
+        child: Center(
+          child: Column(
+            children: <Widget>[
+              Text(_value),
+              IconButton(
+                icon: Icon(Icons.timer),
+                onPressed: _onClicked,
+                tooltip: "Click me",
+              ),
+              Expanded(
+                child: ListView(children: _list),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
