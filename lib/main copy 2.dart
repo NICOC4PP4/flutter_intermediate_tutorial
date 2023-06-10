@@ -1,5 +1,4 @@
 import "package:flutter/material.dart";
-import "dart:async";
 
 void main() {
   runApp(
@@ -15,52 +14,62 @@ class MyApp extends StatefulWidget {
 }
 
 class _State extends State<MyApp> {
-  //build a button that when clicked, will start a round progress indicator that will take 10 seconds to complete
-  //when the progress indicator is complete, it will display a snackbar that says "Process Complete"
+  int _randomTile = 0;
+  int _correctTile = 0;
 
-  int _seconds = 10;
-  int _secondsRemaining = 10;
+  int generateRandomNumber() {
+    //generate a random number between 0 and 8
+    int _randomTile = DateTime.now().millisecond % 8;
+    return _randomTile;
+  }
 
-  void _startTimer() {
-    _secondsRemaining = _seconds;
-    Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        if (_secondsRemaining > 0) {
-          _secondsRemaining--;
-        } else {
-          timer.cancel();
-        }
-      });
-    });
+  @override
+  void initState() {
+    super.initState();
+    // print this number to console
+    _randomTile = generateRandomNumber();
+    // print to console
+    print(_randomTile);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Timer 10 seconds"),
+        title: Text("Tile Game"),
       ),
-      //floating button that starts the countdown
-
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _startTimer(),
-        child: Icon(Icons.timer),
-      ),
-
       body: Container(
-        padding: EdgeInsets.all(32.0),
-        child: Center(
-          child: Column(
-            children: <Widget>[
-              //display the countdown
-              Text("$_secondsRemaining"),
-              Padding(padding: EdgeInsets.all(32.0)), // fixed typo here
-              //display the progress indicator
-              CircularProgressIndicator(
-                value: _secondsRemaining.toDouble() / _seconds.toDouble(),
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 3,
+                children: List.generate(9, (index) {
+                  return Container(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        //if the user clicks on the correct tile
+                        if (index == _correctTile) {
+                          //print to console
+                          print("Correct");
+                          //generate a new random number
+                          _correctTile = generateRandomNumber();
+                          //print to console
+                          print(_correctTile);
+                          //update the UI
+                          setState(() {});
+                        } else {
+                          //print to console
+                          print("Incorrect");
+                        }
+                      },
+                      child: Text("Tile $index"),
+                    ),
+                  );
+                }),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
